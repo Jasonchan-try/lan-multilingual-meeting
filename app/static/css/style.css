@@ -1,0 +1,27 @@
+:root { --bg:#f6f8fb; --card:#fff; --text:#1f2937; --border:#d0d7e2; --accent:#0f766e; --danger:#b91c1c; }
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:"Microsoft YaHei",sans-serif}
+.container{max-width:960px;margin:20px auto;padding:12px}.narrow{max-width:500px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+label{display:block;margin-bottom:10px}input,select,button{width:100%;padding:9px;border:1px solid var(--border);border-radius:8px}
+button{background:var(--accent);color:#fff;border:none;cursor:pointer}button.danger{background:var(--danger)}
+.messages{height:420px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px;margin-bottom:10px}
+.msg{border-bottom:1px solid #eef2f7;padding:8px 0}.meta{font-size:12px;color:#6b7280}.orig{margin:4px 0}.trans{margin:4px 0;color:#065f46}
+.composer{display:flex;gap:8px;align-items:stretch}
+.composer textarea{
+  flex:1;
+  min-height:96px;
+  resize:vertical;
+  font-size:16px;
+  line-height:1.5;
+}
+.composer button{
+  width:110px;
+}
+@media(max-width:700px){
+  .composer{flex-direction:column}
+  .composer button{width:100%}
+  .composer textarea{min-height:120px}
+}
+pre{white-space:pre-wrap;max-height:350px;overflow:auto}
+.qr{max-width:180px}

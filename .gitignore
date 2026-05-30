@@ -1,0 +1,37 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+.venv_mac/
+venv/
+env/
+
+# Pytest
+.pytest_cache/
+
+# Environment variables
+.env
+
+# Temporary files
+temp/
+*.log
+
+# Backup files
+backups/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Misc
+*.tmp
+历史对话恢复_2026-05-27.txt
+AI开发指令书_局域网临时AI会议室.txt
+*.swp

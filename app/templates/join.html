@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>加入会议</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container narrow">
+    <h1>加入临时AI会议室</h1>
+    <div class="card">
+      <label>会议码 <input id="meeting-code" /></label>
+      <label>昵称 <input id="nickname" /></label>
+      <label>语言
+        <select id="language">
+          <option value="zh">中文</option>
+          <option value="ja">日语</option>
+        </select>
+      </label>
+      <button type="button" id="join-btn">加入会议</button>
+      <p id="join-message"></p>
+    </div>
+  </div>
+  <script src="/static/js/join.js?v=20260528-room-check"></script>
+</body>
+</html>

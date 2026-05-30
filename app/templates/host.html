@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>主持人控制台</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>临时AI会议室 - 主持人控制台</h1>
+    <div class="card" id="meeting-info"></div>
+    <div class="grid">
+      <div class="card">
+        <h2>会议设置</h2>
+        <label>会议名称 <input id="meeting-name" /></label>
+        <label>翻译模式
+          <select id="translation-enabled">
+            <option value="true">开启双向翻译</option>
+            <option value="false">不翻译</option>
+          </select>
+        </label>
+        <label>纪要语言
+          <select id="summary-language">
+            <option value="zh">中文</option>
+            <option value="ja">日语</option>
+          </select>
+        </label>
+        <button id="save-settings">保存设置</button>
+      </div>
+      <div class="card">
+        <h2>会议操作</h2>
+        <button id="create-meeting">创建新会议</button>
+        <button id="generate-summary">生成会议纪要</button>
+        <button id="download-md">下载纪要(MD)</button>
+        <button id="download-txt">下载纪要(TXT)</button>
+        <button class="danger" id="dissolve">解散会议室</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>在线成员</h2>
+      <ul id="members"></ul>
+    </div>
+    <div class="card">
+      <h2>纪要预览</h2>
+      <pre id="summary-preview"></pre>
+    </div>
+  </div>
+  <script src="/static/js/host.js?v=20260528-room-check"></script>
+</body>
+</html>

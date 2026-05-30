@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>会议聊天</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 id="title">会议聊天</h1>
+    <p id="mode"></p>
+    <div id="messages" class="messages"></div>
+    <div class="composer">
+      <textarea id="message-input" rows="3" placeholder="输入消息（可多行）"></textarea>
+      <button id="send-btn" disabled>发送</button>
+    </div>
+    <p id="system-note"></p>
+  </div>
+  <script src="/static/js/chat.js?v=20260528-room-check"></script>
+</body>
+</html>
