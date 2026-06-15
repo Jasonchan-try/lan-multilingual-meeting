@@ -11,12 +11,29 @@
     <h1 id="title">会议聊天</h1>
     <p id="mode"></p>
     <div id="messages" class="messages"></div>
+    <div id="attach-preview"></div>
     <div class="composer">
-      <textarea id="message-input" rows="3" placeholder="输入消息（可多行）"></textarea>
-      <button id="send-btn" disabled>发送</button>
+      <textarea id="message-input" rows="3" placeholder="输入消息（Shift+Enter 换行）"></textarea>
+      <div class="composer-actions">
+        <button class="emoji-toggle-btn" id="emoji-btn" title="表情" type="button">😊</button>
+        <label class="attach-btn" title="添加附件" id="attach-label">
+          📎
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/gif,image/webp,.txt,.pdf,.docx,.xlsx,.zip,.csv" hidden />
+        </label>
+        <button id="send-btn" disabled>发送</button>
+      </div>
+    </div>
+    <!-- emoji 面板 -->
+    <div id="emoji-panel" class="emoji-panel hidden">
+      <span>👍</span><span>👎</span><span>😄</span><span>😂</span><span>😊</span>
+      <span>😅</span><span>🤔</span><span>😮</span><span>😢</span><span>😡</span>
+      <span>🎉</span><span>🙏</span><span>👏</span><span>❤️</span><span>💡</span>
+      <span>✅</span><span>❌</span><span>⚠️</span><span>🔥</span><span>💯</span>
+      <span>🚀</span><span>⏰</span><span>📌</span><span>📝</span><span>🔔</span>
+      <span>😎</span><span>🤝</span><span>💪</span><span>🌟</span><span>😴</span>
     </div>
     <p id="system-note"></p>
   </div>
-  <script src="/static/js/chat.js?v=20260528-room-check"></script>
+  <script src="/static/js/chat.js?v=20260602-emoji"></script>
 </body>
 </html>

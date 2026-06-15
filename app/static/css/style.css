@@ -7,21 +7,74 @@ label{display:block;margin-bottom:10px}input,select,button{width:100%;padding:9p
 button{background:var(--accent);color:#fff;border:none;cursor:pointer}button.danger{background:var(--danger)}
 .messages{height:420px;overflow:auto;background:#fff;border:1px solid var(--border);border-radius:10px;padding:8px;margin-bottom:10px}
 .msg{border-bottom:1px solid #eef2f7;padding:8px 0}.meta{font-size:12px;color:#6b7280}.orig{margin:4px 0}.trans{margin:4px 0;color:#065f46}
+
+/* 附件预览区（发送前） */
+#attach-preview{margin-bottom:6px;min-height:0}
+.attach-preview-box{display:flex;align-items:center;gap:10px;background:#f0faf8;border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:6px}
+.attach-preview-box img{max-height:60px;max-width:80px;border-radius:4px;object-fit:cover}
+.attach-preview-box .attach-name{flex:1;font-size:13px;color:var(--text);word-break:break-all}
+.attach-preview-box .attach-remove{background:none;border:none;color:var(--danger);cursor:pointer;font-size:18px;width:auto;padding:0 4px}
+
+/* composer 布局 */
 .composer{display:flex;gap:8px;align-items:stretch}
-.composer textarea{
-  flex:1;
-  min-height:96px;
-  resize:vertical;
-  font-size:16px;
-  line-height:1.5;
+.composer textarea{flex:1;min-height:96px;resize:vertical;font-size:16px;line-height:1.5}
+.composer-actions{display:flex;flex-direction:column;gap:6px;width:110px}
+
+/* emoji 切换按钮 */
+.emoji-toggle-btn{
+  width:100%;height:40px;
+  background:#f0faf8;border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;font-size:20px;color:inherit;
+  flex-shrink:0;
 }
-.composer button{
-  width:110px;
+.emoji-toggle-btn:hover{background:#d1fae5}
+
+/* 附件按钮 */
+.attach-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;height:40px;
+  background:#f0faf8;border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;font-size:20px;margin-bottom:0;
+  transition:background 0.15s;
 }
+.attach-btn:hover{background:#d1fae5}
+.composer-actions button#send-btn{width:100%;flex:1}
+
+/* emoji 面板 */
+.emoji-panel{
+  display:flex;flex-wrap:wrap;gap:4px;
+  background:#fff;border:1px solid var(--border);border-radius:10px;
+  padding:10px;margin-bottom:8px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.10);
+}
+.emoji-panel.hidden{display:none}
+.emoji-panel span{
+  font-size:22px;cursor:pointer;padding:4px 6px;border-radius:6px;
+  transition:background 0.12s;user-select:none;
+}
+.emoji-panel span:hover{background:#d1fae5}
+
 @media(max-width:700px){
   .composer{flex-direction:column}
-  .composer button{width:100%}
+  .composer-actions{flex-direction:row;width:100%}
+  .emoji-toggle-btn{width:44px;flex-shrink:0}
+  .attach-btn{width:44px;flex-shrink:0}
+  .composer-actions button#send-btn{width:100%}
   .composer textarea{min-height:120px}
 }
+
+/* 消息内附件渲染 */
+.msg-image{margin-top:6px}
+.msg-image img{max-width:260px;max-height:200px;border-radius:6px;border:1px solid var(--border);cursor:pointer;object-fit:cover}
+.msg-text-content{margin-top:6px;background:#f6f8fb;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:13px;white-space:pre-wrap;max-height:120px;overflow:auto}
+.msg-file{margin-top:6px}
+.msg-file a{display:inline-flex;align-items:center;gap:6px;color:var(--accent);text-decoration:none;font-size:13px;border:1px solid var(--border);border-radius:6px;padding:5px 10px;background:#f6f8fb}
+.msg-file a:hover{background:#d1fae5}
+
+/* 图片灯箱 */
+#lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center;cursor:zoom-out}
+#lightbox.active{display:flex}
+#lightbox img{max-width:90vw;max-height:90vh;border-radius:8px;box-shadow:0 4px 32px rgba(0,0,0,0.5)}
+
 pre{white-space:pre-wrap;max-height:350px;overflow:auto}
 .qr{max-width:180px}

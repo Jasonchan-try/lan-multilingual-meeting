@@ -1,8 +1,11 @@
-from fastapi import APIRouter, HTTPException
+import uuid
+from pathlib import Path
+
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from app.config import settings
+from app.config import settings, TEMP_DIR
 from app.models.message import Message
 from app.services.cleanup_service import CleanupService
 from app.services.meeting_service import meeting_service
@@ -14,6 +17,14 @@ from app.utils.network import get_lan_ip
 router = APIRouter(prefix="/api")
 summary_service = SummaryService()
 translation_service = TranslationService()
+
+# 允许上传的扩展名
+ALLOWED_EXTENSIONS = {
+    '.jpg', '.jpeg', '.png', '.gif', '.webp',  # 图片
+    '.txt',                                     # 纯文本
+    '.pdf', '.docx', '.xlsx', '.zip', '.csv',  # 其他可下载类型
+}
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
 
 class JoinRequest(BaseModel):
@@ -34,7 +45,12 @@ class PostMessageRequest(BaseModel):
     participant_id: str
     sender_name: str
     sender_language: str
-    text: str
+    text: str = ''
+    attachment_url: str | None = None
+    attachment_name: str | None = None
+    attachment_type: str | None = None
+    attachment_size: int | None = None
+    attachment_text: str | None = None
 
 
 def _get_active_meeting():
@@ -108,11 +124,76 @@ async def join_meeting(payload: JoinRequest):
     return {"ok": True, "room_id": meeting.room_id}
 
 
+@router.post("/meeting/upload")
+async def upload_file(
+    file: UploadFile = File(...),
+    room_id: str = Form(...),
+    participant_id: str = Form(...),
+):
+    """上传附件，返回访问 URL 及元信息"""
+    _validate_room_and_participant(room_id, participant_id)
+
+    # 校验扩展名
+    original_name = file.filename or 'file'
+    suffix = Path(original_name).suffix.lower()
+    if suffix not in ALLOWED_EXTENSIONS:
+        raise HTTPException(status_code=400, detail=f"不支持的文件类型：{suffix}")
+
+    # 读取内容并校验大小
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="文件不能超过 10MB")
+
+    # 判断类型
+    if suffix in {'.jpg', '.jpeg', '.png', '.gif', '.webp'}:
+        file_type = 'image'
+    elif suffix == '.txt':
+        file_type = 'text'
+    else:
+        file_type = 'other'
+
+    # 存到 temp 目录，用 uuid 避免文件名冲突
+    safe_name = f"{uuid.uuid4().hex}{suffix}"
+    save_path = TEMP_DIR / safe_name
+    save_path.write_bytes(content)
+
+    # txt 文件读取前 2000 字符供聊天内预览
+    text_content = None
+    if file_type == 'text':
+        try:
+            text_content = content.decode('utf-8', errors='replace')[:2000]
+        except Exception:
+            text_content = None
+
+    file_url = f"/api/meeting/file/{safe_name}"
+    return {
+        "url": file_url,
+        "filename": safe_name,
+        "original_name": original_name,
+        "file_type": file_type,
+        "file_size": len(content),
+        "text_content": text_content,
+    }
+
+
+@router.get("/meeting/file/{filename}")
+async def serve_file(filename: str):
+    """提供附件的访问/下载"""
+    # 防止路径穿越
+    safe = Path(filename).name
+    file_path = TEMP_DIR / safe
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="文件不存在或已过期")
+    return FileResponse(path=file_path, filename=safe)
+
+
 @router.post("/meeting/message")
 async def post_message(payload: PostMessageRequest):
     meeting = _validate_room_and_participant(payload.room_id, payload.participant_id)
     text = payload.text.strip()
-    if not text:
+
+    # 文字和附件至少有一个
+    if not text and not payload.attachment_url:
         raise HTTPException(status_code=400, detail="消息不能为空")
 
     msg = Message(
@@ -120,7 +201,17 @@ async def post_message(payload: PostMessageRequest):
         sender_name=payload.sender_name or "匿名",
         sender_language=payload.sender_language or "zh",
         original_text=text,
+        attachment_url=payload.attachment_url,
+        attachment_name=payload.attachment_name,
+        attachment_type=payload.attachment_type,
+        attachment_size=payload.attachment_size,
+        attachment_text=payload.attachment_text,
     )
+
+    # ✅ 先入库，前端 poll 可立即看到消息
+    meeting_service.post_message(msg)
+
+    # 再翻译（仅对文字内容翻译，附件不翻译）
     print(
         "AI translation status:",
         {
@@ -128,9 +219,9 @@ async def post_message(payload: PostMessageRequest):
             **translation_service.diagnostics(),
         },
     )
-    if meeting.translation_enabled:
+    if meeting.translation_enabled and text:
         msg.translated_text = translation_service.translate_bi(msg.original_text, msg.sender_language)
-    meeting_service.post_message(msg)
+
     return {
         "ok": True,
         "message": {
@@ -139,6 +230,11 @@ async def post_message(payload: PostMessageRequest):
             "original_text": msg.original_text,
             "translated_text": msg.translated_text,
             "timestamp": msg.timestamp,
+            "attachment_url": msg.attachment_url,
+            "attachment_name": msg.attachment_name,
+            "attachment_type": msg.attachment_type,
+            "attachment_size": msg.attachment_size,
+            "attachment_text": msg.attachment_text,
         },
     }
 
@@ -162,6 +258,7 @@ async def get_messages(
         if from_index < 0:
             from_index = 0
         sliced = meeting.messages[from_index:]
+
     data = [
         {
             "sender_name": m.sender_name,
@@ -169,6 +266,11 @@ async def get_messages(
             "original_text": m.original_text,
             "translated_text": m.translated_text,
             "timestamp": m.timestamp,
+            "attachment_url": m.attachment_url,
+            "attachment_name": m.attachment_name,
+            "attachment_type": m.attachment_type,
+            "attachment_size": m.attachment_size,
+            "attachment_text": m.attachment_text,
         }
         for m in sliced
     ]
